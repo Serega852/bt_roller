@@ -143,16 +143,13 @@ int main(void)
 	}
   HAL_GPIO_WritePin(Bluetooth_EN_GPIO_Port, Bluetooth_EN_Pin, GPIO_PIN_SET);
   /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
     /* USER CODE END WHILE */
-		HAL_UART_Transmit(&huart1, data, 4, 0xFFFF);
-		//HAL_Delay(1000);
-		HAL_Delay(1000);
-		HAL_UART_Receive(&huart1, res, 4, 0xFF);
-		printf("s=%s\r\n", res);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
