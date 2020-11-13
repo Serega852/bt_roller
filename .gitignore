@@ -1,0 +1,16 @@
+
+*.o
+
+*.crf
+
+*.axf
+
+*.hex
+
+*.map
+
+*.dep
+
+*.htm
+
+*.Sergey

@@ -152,10 +152,7 @@ int main(void)
 		//HAL_Delay(1000);
 		HAL_Delay(1000);
 		HAL_UART_Receive(&huart1, res, 4, 0xFF);
-		for (int i = 0; i < 10; i++) {
-		printf("s=%c\r\n", res[i]);
-		}
-		printf("end");
+		printf("s=%s\r\n", res);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
