@@ -75,7 +75,7 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+static uint8_t * at_command(uint8_t input[100]);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -136,12 +136,28 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   printf("INIT FINISH\n\r");
-	uint8_t data[100] = "AT\r\n";
-	uint8_t res[100];
-	for (int i = 0; i < 10; i++) {
-		res[i] = 0x50;
-	}
-  HAL_GPIO_WritePin(Bluetooth_EN_GPIO_Port, Bluetooth_EN_Pin, GPIO_PIN_SET);
+	HAL_Delay(1000);
+	char res[100];
+	HAL_GPIO_WritePin(Bluetooth_KEY_GPIO_Port, Bluetooth_KEY_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(Bluetooth_EN_GPIO_Port, Bluetooth_EN_Pin, GPIO_PIN_SET);
+	
+	HAL_Delay(1000);
+	printf("address=%s", at_command("AT+ADDR?\r\n"));
+	printf("uart=%s", at_command("AT+UART?\r\n"));
+	at_command("AT+DISC\r\n");
+	at_command("AT+ORGL\r\n");
+	at_command("AT+RMAAD\r\n");
+	at_command("AT+NAME=myDVC\r\n");
+	printf("name=%s\n\r", at_command("AT+NAME?\r\n"));
+	at_command("AT+ROLE=0\r\n");
+	at_command("AT+UART=38400,0,0\r\n");
+	HAL_Delay(100);
+	HAL_GPIO_WritePin(Bluetooth_KEY_GPIO_Port, Bluetooth_KEY_Pin, GPIO_PIN_RESET);
+	HAL_Delay(100);
+	at_command("AT+RESET\r\n");
+	
+	HAL_Delay(1000);
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -151,6 +167,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		HAL_Delay(1000);
+		HAL_UART_Transmit(&huart1, "data", 4, 0xFF);
+		uint8_t data[100];
+		HAL_UART_Receive(&huart1, data, 100, 0xFF);
+		printf("s=%s", data);
   }
   /* USER CODE END 3 */
 }
@@ -280,7 +301,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(Bluetooth_EN_GPIO_Port, Bluetooth_EN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, Bluetooth_EN_Pin|Bluetooth_KEY_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -295,17 +316,30 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Bluetooth_EN_Pin */
-  GPIO_InitStruct.Pin = Bluetooth_EN_Pin;
+  /*Configure GPIO pins : Bluetooth_EN_Pin Bluetooth_KEY_Pin */
+  GPIO_InitStruct.Pin = Bluetooth_EN_Pin|Bluetooth_KEY_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(Bluetooth_EN_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
-
+uint8_t * at_command(uint8_t input[100]) {
+	static uint8_t result[100];
+	for (int i = 0; i < 100; i++) {
+		result[i] = 0;
+	}
+	//memset(result, 0, strlen(result));
+	HAL_Delay(100);
+	HAL_UART_Transmit(&huart1, input, strlen(input), 0xFF);
+	HAL_UART_Receive(&huart1, result, 100, 0xFF);
+	HAL_Delay(100);
+	printf("%s='%s'\n\r", input, result);
+	HAL_Delay(100);
+	return result;
+}
 /* USER CODE END 4 */
 
 /**

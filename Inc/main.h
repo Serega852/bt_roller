@@ -98,6 +98,8 @@ void Error_Handler(void);
 #define SWO_GPIO_Port GPIOB
 #define Bluetooth_EN_Pin GPIO_PIN_8
 #define Bluetooth_EN_GPIO_Port GPIOB
+#define Bluetooth_KEY_Pin GPIO_PIN_9
+#define Bluetooth_KEY_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
